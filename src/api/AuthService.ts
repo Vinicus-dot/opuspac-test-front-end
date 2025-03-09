@@ -14,8 +14,8 @@ export default class AuthService {
       localStorage.setItem('token', response.data.token)
       
       return response.data
-    } catch (error) {
-      throw new Error('Erro ao fazer login')
+    } catch (error: any) {
+      throw new Error('Erro ao fazer login, ' + error.response.data.Message)
     }
   }
 

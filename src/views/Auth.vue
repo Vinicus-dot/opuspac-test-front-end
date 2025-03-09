@@ -88,6 +88,7 @@
 import { defineComponent, ref, reactive } from 'vue'
 import AuthService from '@/api/AuthService'
 import { useToast } from 'vue-toastification';
+import { useRouter } from 'vue-router';
 export default defineComponent({
   name: 'Auth',
   setup() {
@@ -98,17 +99,49 @@ export default defineComponent({
       password: '',
       name: ''
     })
+    const router = useRouter(); 
 
     const handleSubmit = async () => {
+      const toast = useToast()
+      if (!form.email.trim()) {
+        toast.error('O email é obrigatório')
+        return
+      }
+
+      if (!form.password.trim()) {
+        toast.error('A senha é obrigatória')
+        return
+      }
+
+      if (!isLogin.value && !form.name.trim()) {
+        toast.error('O nome é obrigatório')
+        return
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(form.email)) {
+        toast.error('Por favor, insira um email válido')
+        return
+      }
+
       try {
         if (isLogin.value) {
-          await authService.login(form.email, form.password)
+            await authService.login(form.email, form.password)
+            toast.success('Login realizado com sucesso')
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            router.push('/products') 
         } else {
           await authService.register(form.email, form.password, form.name)
+          toast.success('Registro realizado com sucesso')
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          form.email = ''
+          form.password = ''
+          form.name = ''
+          isLogin.value = true
         }
-      } catch (error) {
-        const toast = useToast()
-        toast.error('Erro na autenticação')
+        
+      } catch (error: any) {
+        toast.error(error.message)
       }
     }
 
