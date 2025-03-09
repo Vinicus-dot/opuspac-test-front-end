@@ -1,6 +1,6 @@
 export interface Order {
-  Id: number;
-  Message: string;
+  id: number;
+  message: string;
 }
 
 

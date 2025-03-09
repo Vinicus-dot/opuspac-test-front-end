@@ -16,14 +16,14 @@
           </thead>
           <tbody>
             <tr v-for="product in products" 
-                :key="product.Id"
+                :key="product.id"
                 class="hover:bg-blue-50 transition-colors duration-150">
-              <td class="border-b border-gray-200 p-4">{{ product.Id }}</td>
-              <td class="border-b border-gray-200 p-4 font-medium">{{ product.Name }}</td>
-              <td class="border-b border-gray-200 p-4 text-gray-600">{{ product.Description }}</td>
-              <td class="border-b border-gray-200 p-4 font-medium text-green-600">
-                R$ {{ product.price.toFixed(2) }}
-              </td>
+            <td class="border-b border-gray-200 p-4">{{ product.id }}</td>
+            <td class="border-b border-gray-200 p-4 font-medium">{{ product.name }}</td>
+            <td class="border-b border-gray-200 p-4 text-gray-600">{{ product.description }}</td>
+            <td class="border-b border-gray-200 p-4 font-medium text-green-600">
+                R$ {{ product.price ? product.price.toFixed(2) : '0.00' }}
+            </td>
             </tr>
           </tbody>
         </table>
@@ -60,9 +60,9 @@ export default {
         try {
             const productService = new ProductService();
             this.products = await productService.getProducts();
-        } catch (error) {
+        } catch (error: any) {
             const toast = useToast()
-            toast.error('Erro ao carregar produtos');
+            toast.error('Erro ao carregar produtos'+ error.message);
         }
     }
   }

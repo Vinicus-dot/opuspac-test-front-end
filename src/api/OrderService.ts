@@ -6,8 +6,13 @@ export default class OrderService {
 
     async getOrders(): Promise<Order[]> { 
         try {
-            const response = await axios.get(`${this.baseUrl}`);
-            console.log('response', this.baseUrl);
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${this.baseUrl}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
             return response.data as Order[]; 
         } catch (error) {
             throw new Error('Erro ao buscar pedidos');

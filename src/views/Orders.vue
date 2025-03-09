@@ -13,9 +13,9 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="order in orders" :key="order.Id" class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ order.Id }}</td>
-                <td class="px-6 py-4 whitespace-normal text-sm text-gray-500">{{ order.Message }}</td>
+              <tr v-for="order in orders" :key="order.id" class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ order.id }}</td>
+                <td class="px-6 py-4 whitespace-normal text-sm text-gray-500">{{ order.message }}</td>
               </tr>
             </tbody>
           </table>
