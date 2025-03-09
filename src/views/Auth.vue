@@ -87,7 +87,7 @@
 <script lang="ts">
 import { defineComponent, ref, reactive } from 'vue'
 import AuthService from '@/api/AuthService'
-
+import { useToast } from 'vue-toastification';
 export default defineComponent({
   name: 'Auth',
   setup() {
@@ -107,7 +107,8 @@ export default defineComponent({
           await authService.register(form.email, form.password, form.name)
         }
       } catch (error) {
-        console.error('Erro na autenticação:', error)
+        const toast = useToast()
+        toast.error('Erro na autenticação')
       }
     }
 

@@ -1,7 +1,5 @@
 # opuspac-test-front-end
 
-Este template deve ajudar você a começar a desenvolver com Vue 3 no Vite.
-
 ## Requisitos
 
 Antes de começar, certifique-se de ter o [Node.js](https://nodejs.org/) instalado em sua máquina. O Node.js é necessário para executar o Vite e gerenciar as dependências do projeto.

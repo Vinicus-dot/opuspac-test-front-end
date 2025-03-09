@@ -40,6 +40,7 @@
 import ProductService from '@/api/ProductService';
 import NavBar from '@/components/NavBar.vue';
 import type { Product } from '@/models/Products';
+import { useToast } from 'vue-toastification';
 
 export default {
   name: 'Products',
@@ -52,12 +53,17 @@ export default {
     }
   },
   created() {
-    this.loadProducts();
+      this.loadProducts();
   },
   methods: {
     async loadProducts() {
-      const productService = new ProductService();
-      this.products = await productService.getProducts();
+        try {
+            const productService = new ProductService();
+            this.products = await productService.getProducts();
+        } catch (error) {
+            const toast = useToast()
+            toast.error('Erro ao carregar produtos');
+        }
     }
   }
 }

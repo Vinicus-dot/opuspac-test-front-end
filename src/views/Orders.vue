@@ -32,6 +32,7 @@
 import OrdersService from '@/api/OrderService';
 import NavBar from '@/components/NavBar.vue';
 import type { Order } from '@/models/Order';
+import { useToast } from 'vue-toastification';
 
 export default {
   name: 'Orders',
@@ -48,8 +49,13 @@ export default {
   },
   methods: {
     async loadOrders() {
-      const orderService = new OrdersService();
-      this.orders = await orderService.getOrders();
+      try {
+        const orderService = new OrdersService();
+        this.orders = await orderService.getOrders();
+      } catch (error) {
+        const toast = useToast()
+        toast.error('Erro ao carregar pedidos');
+      }
     }
   }
 };
