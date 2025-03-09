@@ -10,7 +10,7 @@
         @created="createProduct"
         :isCreated="isCreated"
         />
-      <div v-if="products.length > 0" class="mt-4 bg-white rounded-lg shadow-md overflow-hidden">
+      <div v-if="products.data.length > 0" class="mt-4 bg-white rounded-lg shadow-md overflow-hidden">
         <table class="w-full border-collapse">
           <thead>
             <tr>
@@ -21,7 +21,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="product in products" 
+            <tr v-for="product in products.data" 
                 :key="product.id"
                 class="hover:bg-blue-50 transition-colors duration-150">
             <td class="border-b border-gray-200 p-4">{{ product.id }}</td>
@@ -38,6 +38,16 @@
            class="mt-4 p-6 bg-white rounded-lg shadow-md text-center text-gray-600">
         Nenhum produto encontrado.
       </div>
+
+      <!-- Add Pagination component -->
+      <Pagination
+        v-if="products.total > products.pageSize"
+        :total-items="products.total"
+        :items-per-page="products.pageSize"
+        :modelValue="products.pageNumber"
+        @update:modelValue="handlePageChange"
+        class="mt-4"
+      />
     </div>
   </div>
 </template>
@@ -47,26 +57,48 @@ import ProductService from '@/api/ProductService';
 import { defineComponent, ref, onMounted, watch } from 'vue';
 import NavBar from '@/components/NavBar.vue';
 import NewProduct from '@/components/NewProduct.vue';
+import Pagination from '@/components/Pagination.vue';
 import type { Product } from '@/models/Products';
+import type { ListResponse } from '@/models/ListResponse';
 import { useToast } from 'vue-toastification';
 
 export default defineComponent({
   name: 'Products',
   components: {
     NavBar,
-    NewProduct
+    NewProduct,
+    Pagination
   },
   setup() {
-    const products = ref<Product[]>([]);
+    const products = ref<ListResponse<Product>>({
+      data: [],
+      total: 0,
+      pageNumber: 1,
+      pageSize: 10
+    });
     const isModalOpen = ref(false);
     const isCreated = ref(false);
     const toast = useToast();
 
-    const loadProducts = async () => {
+    const loadProducts = async (page: number = 1) => {
       try {
+        console.log('Carregando produtos da página:', page);
         const productService = new ProductService();
-        products.value = await productService.getProducts();
+        const response = await productService.getProducts(page, products.value.pageSize);
+        
+        console.log('Resposta do servidor:', response); // Debug
+
+        // Criar um novo objeto para forçar a reatividade
+        products.value = {
+          data: [...response.data], // Criar uma nova array
+          total: response.total,
+          pageSize: response.pageSize || 10,
+          pageNumber: page
+        };
+        
+        console.log('Produtos atualizados:', products.value);
       } catch (error: any) {
+        console.error('Erro ao carregar produtos:', error);
         toast.error('Erro ao carregar produtos: ' + error.message);
       }
     };
@@ -83,12 +115,18 @@ export default defineComponent({
       isCreated.value = !isCreated.value;
     };
 
-    // Observa mudanças no isCreated
+    const handlePageChange = async (page: number) => {
+      console.log('Mudando para página:', page);
+      if (page !== products.value.pageNumber) {
+        await loadProducts(page);
+      }
+    };
+
+    // Update watch to include page reset
     watch(isCreated, () => {
-      loadProducts();
+      loadProducts(1);
     });
 
-    // Carrega produtos ao montar o componente
     onMounted(() => {
       loadProducts();
     });
@@ -100,8 +138,14 @@ export default defineComponent({
       openModal,
       closeModal,
       createProduct,
-      loadProducts
+      loadProducts,
+      handlePageChange
     };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.products.total / this.products.pageSize);
+    }
   }
 });
 </script>

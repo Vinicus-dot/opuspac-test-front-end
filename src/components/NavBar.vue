@@ -12,7 +12,7 @@
               Home
             </router-link>
           </li>
-          <li>
+          <li v-if="isAuthenticated">
             <router-link 
               to="/orders" 
               class="text-gray-300 hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-md hover:bg-gray-700"
@@ -20,7 +20,7 @@
               Orders
             </router-link>
           </li>
-          <li>
+          <li v-if="isAuthenticated">
             <router-link 
               to="/products" 
               class="text-gray-300 hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-md hover:bg-gray-700"
@@ -28,12 +28,21 @@
               Produtos
             </router-link>
           </li>
-          <li>
+          <li v-if="!isAuthenticated">
             <router-link 
               to="/auth" 
               class="text-gray-300 hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-md hover:bg-gray-700"
             >
               Login
+            </router-link>
+          </li>
+          <li v-if="isAuthenticated">
+            <router-link 
+              to="/auth" 
+              class="text-gray-300 hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-md hover:bg-gray-700"
+              @click.prevent="logout"
+            >
+              Logout
             </router-link>
           </li>
           
@@ -44,7 +53,15 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 
+const isAuthenticated = computed(() => {
+  return !!localStorage.getItem('token')
+})
+
+const logout = () => {
+  localStorage.removeItem('token');
+}
 </script>
 
 <style scoped>
@@ -53,4 +70,3 @@
   background-color: rgb(55, 65, 81);
 }
 </style>
-
