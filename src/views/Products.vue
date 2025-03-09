@@ -3,7 +3,13 @@
     <NavBar />
     <div class="max-w-7xl mx-auto p-6">
       <h1 class="text-3xl font-bold mb-6 text-gray-800 border-b pb-2">Lista de Produtos</h1>
-      
+      <button @click="openModal" class="bg-blue-500 text-white px-4 py-2 rounded-md">Novo Produto</button>
+      <NewProduct 
+        :isOpen="isModalOpen"
+        @close="closeModal"
+        @created="createProduct"
+        :isCreated="isCreated"
+        />
       <div v-if="products.length > 0" class="mt-4 bg-white rounded-lg shadow-md overflow-hidden">
         <table class="w-full border-collapse">
           <thead>
@@ -38,35 +44,66 @@
 
 <script lang="ts">
 import ProductService from '@/api/ProductService';
+import { defineComponent, ref, onMounted, watch } from 'vue';
 import NavBar from '@/components/NavBar.vue';
+import NewProduct from '@/components/NewProduct.vue';
 import type { Product } from '@/models/Products';
 import { useToast } from 'vue-toastification';
 
-export default {
+export default defineComponent({
   name: 'Products',
   components: {
-    NavBar
+    NavBar,
+    NewProduct
   },
-  data() {
+  setup() {
+    const products = ref<Product[]>([]);
+    const isModalOpen = ref(false);
+    const isCreated = ref(false);
+    const toast = useToast();
+
+    const loadProducts = async () => {
+      try {
+        const productService = new ProductService();
+        products.value = await productService.getProducts();
+      } catch (error: any) {
+        toast.error('Erro ao carregar produtos: ' + error.message);
+      }
+    };
+
+    const openModal = () => {
+      isModalOpen.value = true;
+    };
+
+    const closeModal = () => {
+      isModalOpen.value = false;
+    };
+
+    const createProduct = () => {
+      isCreated.value = !isCreated.value;
+    };
+
+    // Observa mudanças no isCreated
+    watch(isCreated, () => {
+      loadProducts();
+    });
+
+    // Carrega produtos ao montar o componente
+    onMounted(() => {
+      loadProducts();
+    });
+
     return {
-      products: [] as Product[]
-    }
-  },
-  created() {
-      this.loadProducts();
-  },
-  methods: {
-    async loadProducts() {
-        try {
-            const productService = new ProductService();
-            this.products = await productService.getProducts();
-        } catch (error: any) {
-            const toast = useToast()
-            toast.error('Erro ao carregar produtos'+ error.message);
-        }
-    }
+      products,
+      isModalOpen,
+      isCreated,
+      openModal,
+      closeModal,
+      createProduct,
+      loadProducts
+    };
   }
-}
+});
 </script>
 
 <style scoped>
