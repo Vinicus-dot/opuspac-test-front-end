@@ -7,7 +7,6 @@ export default class ProductService {
 
     async getProducts(pageNumber: number, pageSize: number): Promise<ListResponse<Product>> {
         try {
-            console.log('valores',pageNumber, pageSize)
             const token = localStorage.getItem('token');
             const response = await axios.get(`${this.baseUrl}`, {
                 headers: {

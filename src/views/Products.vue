@@ -82,23 +82,16 @@ export default defineComponent({
 
     const loadProducts = async (page: number = 1) => {
       try {
-        console.log('Carregando produtos da página:', page);
         const productService = new ProductService();
         const response = await productService.getProducts(page, products.value.pageSize);
         
-        console.log('Resposta do servidor:', response); // Debug
-
-        // Criar um novo objeto para forçar a reatividade
         products.value = {
-          data: [...response.data], // Criar uma nova array
+          data: [...response.data], 
           total: response.total,
           pageSize: response.pageSize || 10,
           pageNumber: page
-        };
-        
-        console.log('Produtos atualizados:', products.value);
+        };   
       } catch (error: any) {
-        console.error('Erro ao carregar produtos:', error);
         toast.error('Erro ao carregar produtos: ' + error.message);
       }
     };
@@ -116,13 +109,11 @@ export default defineComponent({
     };
 
     const handlePageChange = async (page: number) => {
-      console.log('Mudando para página:', page);
       if (page !== products.value.pageNumber) {
         await loadProducts(page);
       }
     };
 
-    // Update watch to include page reset
     watch(isCreated, () => {
       loadProducts(1);
     });

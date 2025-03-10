@@ -1,9 +1,19 @@
 <script setup lang="ts">
 import NavBar from '@/components/NavBar.vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const isAuthenticated = ref(false);
+
+const checkAuth = () => {
+  const token = localStorage.getItem('token');
+  isAuthenticated.value = !!token;
+};
+
+onMounted(() => {
+  checkAuth();
+});
 
 const features = ref([
   {
@@ -66,7 +76,7 @@ const navigateTo = (route: string) => {
       </div>
 
       <!-- Call to Action -->
-      <div class="mt-16 text-center">
+      <div v-if="!isAuthenticated" class="mt-16 text-center">
         <p class="text-lg text-gray-600 mb-6">
           Comece agora mesmo a utilizar nossa plataforma
         </p>
